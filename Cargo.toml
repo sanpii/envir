@@ -1,0 +1,11 @@
+[package]
+name = "envir"
+version = "0.1.0"
+authors = ["Sanpi <sanpi@homecomputing.fr>"]
+edition = "2021"
+license = "MIT"
+description = "Deserialize/serialize struct from/to env"
+repository = "https://github.com/sanpii/envir"
+
+[lib]
+proc-macro = true
