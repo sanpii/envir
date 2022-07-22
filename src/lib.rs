@@ -60,7 +60,7 @@ where
 
         regex
             .replace(&x, |caps: &regex::Captures| {
-                std::env::var(&caps["name"]).unwrap().to_string()
+                std::env::var(&caps["name"]).unwrap()
             })
             .to_string()
     });
