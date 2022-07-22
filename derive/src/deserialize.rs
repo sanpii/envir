@@ -14,7 +14,8 @@ pub(crate) fn impl_macro(ast: &syn::DeriveInput) -> syn::Result<proc_macro2::Tok
         );
     }
 
-    let from_body = fields.iter()
+    let from_body = fields
+        .iter()
         .map(|x| gen_field(&attr, x))
         .collect::<Result<Vec<_>, _>>()?;
 
@@ -42,13 +43,10 @@ fn gen_field(
     let field_attr = crate::attr::Field::from_ast(field)?;
     let envir = attr.envir.clone();
     let name = &field.ident;
-    let mut var = field_attr.name.clone().unwrap_or_else(|| field
-        .ident
-        .as_ref()
-        .unwrap()
-        .to_string()
-        .to_uppercase()
-    );
+    let mut var = field_attr
+        .name
+        .clone()
+        .unwrap_or_else(|| field.ident.as_ref().unwrap().to_string().to_uppercase());
 
     if !field_attr.noprefix {
         var.insert_str(0, attr.prefix.as_deref().unwrap_or(""));

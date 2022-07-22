@@ -1,5 +1,4 @@
 #[warn(warnings)]
-
 mod result;
 
 pub use envir_derive::*;
