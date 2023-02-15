@@ -28,9 +28,8 @@ pub(crate) fn error<R>(ast: &dyn quote::ToTokens, message: &str) -> syn::Result<
 }
 
 pub(crate) fn is_option(ty: &syn::Type) -> bool {
-    let typepath = match ty {
-        syn::Type::Path(typepath) => typepath,
-        _ => return false,
+    let syn::Type::Path(typepath) = ty else {
+        return false
     };
 
     typepath.path.leading_colon.is_none()
