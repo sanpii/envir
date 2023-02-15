@@ -9,7 +9,7 @@ use std::collections::HashMap;
 pub trait Serialize {
     fn export(&self) {
         for (k, v) in self.into() {
-            std::env::set_var(k, v)
+            std::env::set_var(k, v);
         }
     }
 
