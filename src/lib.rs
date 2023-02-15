@@ -21,7 +21,7 @@ pub trait Deserialize {
     where
         Self: Sized,
     {
-        let env = HashMap::from_iter(std::env::vars());
+        let env = std::env::vars().collect();
 
         Self::from(&env)
     }
