@@ -7,7 +7,7 @@ mod symbol;
 
 #[proc_macro_derive(Deserialize, attributes(envir))]
 pub fn deserialize_derive(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
-    let ast = syn::parse(input).unwrap();
+    let ast = syn::parse_macro_input!(input);
 
     deserialize::impl_macro(&ast)
         .unwrap_or_else(syn::Error::into_compile_error)
@@ -16,7 +16,7 @@ pub fn deserialize_derive(input: proc_macro::TokenStream) -> proc_macro::TokenSt
 
 #[proc_macro_derive(Serialize, attributes(envir))]
 pub fn serialize_derive(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
-    let ast = syn::parse(input).unwrap();
+    let ast = syn::parse_macro_input!(input);
 
     serialize::impl_macro(&ast)
         .unwrap_or_else(syn::Error::into_compile_error)

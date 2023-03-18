@@ -20,21 +20,16 @@ impl Container {
         for item in flat_map(&ast.attrs)? {
             match &item {
                 // Parse #[envir(internal)]
-                syn::NestedMeta::Meta(syn::Meta::Path(w)) if w == crate::symbol::INTERNAL => {
+                syn::Meta::Path(w) if w == crate::symbol::INTERNAL => {
                     param.envir = quote::quote! { crate };
                 }
                 // Parse #[envir(prefix = "")]
-                syn::NestedMeta::Meta(syn::Meta::NameValue(m))
-                    if m.path == crate::symbol::PREFIX =>
-                {
-                    let prefix = get_lit_str(crate::symbol::PREFIX, &m.lit)?;
+                syn::Meta::NameValue(m) if m.path == crate::symbol::PREFIX => {
+                    let prefix = get_lit_str(crate::symbol::PREFIX, &m.value)?;
                     param.prefix = Some(prefix);
                 }
-                syn::NestedMeta::Meta(meta) => {
-                    return crate::error(meta.path(), "Unknow elephantry container attribute");
-                }
-                syn::NestedMeta::Lit(lit) => {
-                    return crate::error(lit, "Unexpected literal in elephantry field attribute");
+                _ => {
+                    return crate::error(item.path(), "Unknow envir container attribute");
                 }
             }
         }
@@ -73,48 +68,39 @@ impl Field {
         for item in flat_map(&field.attrs)? {
             match &item {
                 // Parse #[envir(default)]
-                syn::NestedMeta::Meta(syn::Meta::Path(w)) if w == crate::symbol::DEFAULT => {
+                syn::Meta::Path(w) if w == crate::symbol::DEFAULT => {
                     param.default = Default::Trait;
                 }
                 // Parse #[envir(default = "")]
-                syn::NestedMeta::Meta(syn::Meta::NameValue(m))
-                    if m.path == crate::symbol::DEFAULT =>
-                {
-                    let value = get_lit_str(crate::symbol::DEFAULT, &m.lit)?;
+                syn::Meta::NameValue(m) if m.path == crate::symbol::DEFAULT => {
+                    let value = get_lit_str(crate::symbol::DEFAULT, &m.value)?;
                     param.default = Default::Path(value);
                 }
                 // Parse #[envir(export_with = "")]
-                syn::NestedMeta::Meta(syn::Meta::NameValue(m))
-                    if m.path == crate::symbol::EXPORT_WITH =>
-                {
-                    let export_with = get_lit(crate::symbol::EXPORT_WITH, &m.lit)?;
+                syn::Meta::NameValue(m) if m.path == crate::symbol::EXPORT_WITH => {
+                    let export_with = get_lit(crate::symbol::EXPORT_WITH, &m.value)?;
                     param.export_with = Some(export_with);
                 }
                 // Parse #[envir(load_with = "")]
-                syn::NestedMeta::Meta(syn::Meta::NameValue(m))
-                    if m.path == crate::symbol::LOAD_WITH =>
-                {
-                    let load_with = get_lit(crate::symbol::LOAD_WITH, &m.lit)?;
+                syn::Meta::NameValue(m) if m.path == crate::symbol::LOAD_WITH => {
+                    let load_with = get_lit(crate::symbol::LOAD_WITH, &m.value)?;
                     param.load_with = Some(load_with);
                 }
                 // Parse #[envir(name = "")]
-                syn::NestedMeta::Meta(syn::Meta::NameValue(m)) if m.path == crate::symbol::NAME => {
-                    let name = get_lit_str(crate::symbol::NAME, &m.lit)?;
+                syn::Meta::NameValue(m) if m.path == crate::symbol::NAME => {
+                    let name = get_lit_str(crate::symbol::NAME, &m.value)?;
                     param.name = Some(name);
                 }
                 // Parse #[envir(nested)]
-                syn::NestedMeta::Meta(syn::Meta::Path(w)) if w == crate::symbol::NESTED => {
+                syn::Meta::Path(w) if w == crate::symbol::NESTED => {
                     param.nested = true;
                 }
                 // Parse #[envir(noprefix)]
-                syn::NestedMeta::Meta(syn::Meta::Path(w)) if w == crate::symbol::NOPREFIX => {
+                syn::Meta::Path(w) if w == crate::symbol::NOPREFIX => {
                     param.noprefix = true;
                 }
-                syn::NestedMeta::Meta(meta) => {
-                    return crate::error(meta.path(), "Unknow envir field attribute");
-                }
-                syn::NestedMeta::Lit(lit) => {
-                    return crate::error(lit, "Unexpected literal in envir field attribute");
+                _ => {
+                    return crate::error(item.path(), "Unknow envir field attribute");
                 }
             }
         }
@@ -125,42 +111,46 @@ impl Field {
 
 fn get_lit(
     attr_name: crate::symbol::Symbol,
-    lit: &syn::Lit,
+    value: &syn::Expr,
 ) -> syn::Result<proc_macro2::TokenStream> {
-    let lit = get_lit_str(attr_name, lit)?;
+    let lit = get_lit_str(attr_name, value)?;
     syn::parse_str(&lit)
 }
 
-fn get_lit_str(attr_name: crate::symbol::Symbol, lit: &syn::Lit) -> syn::Result<String> {
-    if let syn::Lit::Str(lit) = lit {
-        Ok(lit.value())
-    } else {
-        crate::error(
-            lit,
-            &format!(
-                "expected elephantry {attr_name} attribute to be a string: `{attr_name} = \"...\"`"
-            ),
-        )
+fn get_lit_str(attr_name: crate::symbol::Symbol, value: &syn::Expr) -> syn::Result<String> {
+    if let syn::Expr::Lit(syn::ExprLit { lit, .. }) = value {
+        if let syn::Lit::Str(lit) = lit {
+            return Ok(lit.value());
+        }
     }
+
+    crate::error(
+        value,
+        &format!("expected envir {attr_name} attribute to be a string: `{attr_name} = \"...\"`"),
+    )
 }
 
-fn flat_map(attrs: &[syn::Attribute]) -> syn::Result<Vec<syn::NestedMeta>> {
+fn flat_map(attrs: &[syn::Attribute]) -> syn::Result<Vec<syn::Meta>> {
     let mut items = Vec::new();
 
     for attr in attrs {
-        items.append(&mut meta_items(attr)?);
+        items.extend(meta_items(attr)?);
     }
 
     Ok(items)
 }
 
-fn meta_items(attr: &syn::Attribute) -> syn::Result<Vec<syn::NestedMeta>> {
-    if attr.path != crate::symbol::ENVIR {
-        return Ok(Vec::new());
+fn meta_items(
+    attr: &syn::Attribute,
+) -> syn::Result<syn::punctuated::Punctuated<syn::Meta, syn::Token![,]>> {
+    if attr.path() != crate::symbol::ENVIR {
+        return Ok(syn::punctuated::Punctuated::default());
     }
 
-    match attr.parse_meta()? {
-        syn::Meta::List(meta) => Ok(meta.nested.into_iter().collect()),
+    match &attr.meta {
+        syn::Meta::List(meta) => {
+            meta.parse_args_with(syn::punctuated::Punctuated::parse_terminated)
+        }
         _ => crate::error(attr, "expected #[envir(...)]"),
     }
 }
