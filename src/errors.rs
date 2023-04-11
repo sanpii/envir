@@ -8,6 +8,23 @@ pub enum Error {
     Unicode(Unicode),
 }
 
+impl Error {
+    pub(crate) fn parse<T, E: ToString>(key: &str, error: E) -> Self {
+        Self::Parse(Parse {
+            key: key.to_string(),
+            ty: std::any::type_name::<T>().to_string(),
+            error: error.to_string(),
+        })
+    }
+
+    pub(crate) fn unicode(key: &str, value: std::ffi::OsString) -> Self {
+        Self::Unicode(Unicode {
+            key: key.to_string(),
+            value,
+        })
+    }
+}
+
 #[derive(Debug)]
 pub struct Parse {
     key: String,
@@ -15,29 +32,10 @@ pub struct Parse {
     error: String,
 }
 
-impl Parse {
-    pub(crate) fn new<T, E: ToString>(key: &str, error: E) -> crate::Error {
-        crate::Error::Parse(Self {
-            key: key.to_string(),
-            ty: std::any::type_name::<T>().to_string(),
-            error: error.to_string(),
-        })
-    }
-}
-
 #[derive(Debug)]
 pub struct Unicode {
     key: String,
     value: std::ffi::OsString,
-}
-
-impl Unicode {
-    pub(crate) fn new(key: &str, value: std::ffi::OsString) -> crate::Error {
-        crate::Error::Unicode(Self {
-            key: key.to_string(),
-            value,
-        })
-    }
 }
 
 impl std::fmt::Display for Error {

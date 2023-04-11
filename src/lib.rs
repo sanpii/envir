@@ -22,7 +22,6 @@ pub fn dump() -> std::collections::HashMap<String, String> {
     std::env::vars().collect()
 }
 
-#[must_use]
 pub fn try_get<T: std::str::FromStr>(key: &str) -> crate::Result<Option<T>>
 where
     T::Err: ToString,
@@ -34,14 +33,13 @@ where
     let value = match value.to_str() {
         Some(v) => v
             .parse::<T>()
-            .map_err(|e| crate::errors::Parse::new::<T, _>(key, e.to_string()))?,
-        None => return Err(crate::errors::Unicode::new(key, value)),
+            .map_err(|e| crate::Error::parse::<T, _>(key, e.to_string()))?,
+        None => return Err(crate::Error::unicode(key, value)),
     };
 
     Ok(Some(value))
 }
 
-#[must_use]
 pub fn get<T: std::str::FromStr>(key: &str) -> crate::Result<T>
 where
     T::Err: ToString,

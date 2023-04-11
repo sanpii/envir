@@ -83,7 +83,7 @@ where
         .or(default.as_ref())
         .map(|x| {
             x.parse::<T>()
-                .map_err(|e| crate::errors::Parse::new::<T, _>(var, e.to_string()))
+                .map_err(|e| crate::Error::parse::<T, _>(var, e.to_string()))
         })
         .transpose()
 }
@@ -213,7 +213,7 @@ mod test {
         #[envir(internal)]
         struct Test {
             #[envir(default = "${MISSING_ENV}/.config")]
-            config_dir: String,
+            _config_dir: String,
         }
 
         assert!(crate::from_env::<Test>().is_err());
