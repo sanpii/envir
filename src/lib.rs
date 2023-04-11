@@ -1,9 +1,9 @@
 #![warn(warnings)]
 
-mod result;
+mod errors;
 
 pub use envir_derive::*;
-pub use result::*;
+pub use errors::{Result, Error};
 
 use std::collections::HashMap;
 
@@ -70,7 +70,7 @@ where
         .or(default.as_ref())
         .map(|x| {
             x.parse::<T>()
-                .map_err(|e| crate::result::Parse::new::<T, _>(var, e.to_string()))
+                .map_err(|e| crate::errors::Parse::new::<T, _>(var, e.to_string()))
         })
         .transpose()
 }
@@ -92,8 +92,8 @@ where
     let value = match value.to_str() {
         Some(v) => v
             .parse::<T>()
-            .map_err(|e| crate::result::Parse::new::<T, _>(key, e.to_string()))?,
-        None => return Err(crate::result::Unicode::new(key, value)),
+            .map_err(|e| crate::errors::Parse::new::<T, _>(key, e.to_string()))?,
+        None => return Err(crate::errors::Unicode::new(key, value)),
     };
 
     Ok(Some(value))
