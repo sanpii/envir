@@ -107,21 +107,6 @@ where
     crate::try_get(key)?.ok_or_else(|| crate::Error::Missing(key.to_string()))
 }
 
-#[macro_export]
-macro_rules! parse {
-    ($x:expr, $ty:ty) => {
-        if true {
-            $x.parse().map_err(|e| $crate::Error::Parse(e.to_string()))
-        } else if true {
-            <$ty>::from_env()
-        } else {
-            Err($crate::Error::Parse(
-                "{T} should impl FromStr or Deserialize".to_string(),
-            ))
-        }
-    };
-}
-
 #[cfg(test)]
 mod test {
     #[test]
