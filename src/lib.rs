@@ -107,6 +107,10 @@ where
     crate::try_get(key)?.ok_or_else(|| crate::Error::Missing(key.to_string()))
 }
 
+pub fn set<T: ToString>(key: &str, value: T) {
+    std::env::set_var(key, value.to_string());
+}
+
 #[cfg(test)]
 mod test {
     #[test]
@@ -130,8 +134,8 @@ mod test {
             Ok("field5".to_string())
         }
 
-        std::env::set_var("ENV_FOO", "foo");
-        std::env::set_var("ENV_FIELD4", "4");
+        crate::set("ENV_FOO", "foo");
+        crate::set("ENV_FIELD4", 4);
 
         let test = crate::from_env::<Test>().unwrap();
         assert_eq!(
@@ -239,7 +243,7 @@ mod test {
 
     #[test]
     fn get() -> crate::Result {
-        std::env::set_var("TEST", "1");
+        crate::set("TEST", 1);
         assert_eq!(crate::get::<u8>("TEST")?, 1u8);
 
         Ok(())
