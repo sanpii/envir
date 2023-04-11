@@ -56,15 +56,35 @@ where
     T::Err: ToString,
 {
     #[cfg(feature = "extrapolation")]
+    fn try_replace<'t, F: FnMut(&regex::Captures) -> crate::Result<String>> (regex: &regex::Regex, text: &'t str, mut rep: F) -> crate::Result<std::borrow::Cow<'t, str>> {
+        let mut it = regex.captures_iter(text).peekable();
+
+        if it.peek().is_none() {
+            return Ok(std::borrow::Cow::Borrowed(text));
+        }
+
+        let mut new = String::with_capacity(text.len());
+        let mut last_match = 0;
+        for cap in it {
+            // unwrap on 0 is OK because captures only reports matches
+            let m = cap.get(0).unwrap();
+            new.push_str(&text[last_match..m.start()]);
+            new.push_str(&rep(&cap)?);
+            last_match = m.end();
+        }
+        new.push_str(&text[last_match..]);
+        Ok(std::borrow::Cow::Owned(new))
+    }
+
+    #[cfg(feature = "extrapolation")]
     let default = default.map(|x| {
         let regex = regex::Regex::new(r#"\$\{ *(?P<name>.*?) *\}"#).unwrap();
 
-        regex
-            .replace(&x, |caps: &regex::Captures| {
-                std::env::var(&caps["name"]).unwrap()
-            })
-            .to_string()
-    });
+        try_replace(&regex, &x, |caps: &regex::Captures| {
+            crate::get::<String>(&caps["name"])
+        })
+        .map(|x| x.to_string())
+    }).transpose()?;
 
     env.get(var)
         .or(default.as_ref())
@@ -247,5 +267,18 @@ mod test {
         assert_eq!(crate::get::<u8>("TEST")?, 1u8);
 
         Ok(())
+    }
+
+    #[test]
+    #[cfg(feature = "extrapolation")]
+    fn extrapolation_error() {
+        #[derive(crate::Deserialize)]
+        #[envir(internal)]
+        struct Test {
+            #[envir(default = "${MISSING_ENV}/.config")]
+            config_dir: String,
+        }
+
+        assert!(crate::from_env::<Test>().is_err());
     }
 }
