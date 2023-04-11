@@ -18,3 +18,5 @@ impl std::fmt::Display for Error {
         write!(f, "{s}")
     }
 }
+
+impl std::error::Error for Error {}
