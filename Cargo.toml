@@ -16,10 +16,16 @@ dotenvy = "0.15"
 [dependencies.envir_derive]
 version = "0.1"
 path = "derive/"
+optional = true
 
 [dependencies.regex]
 version = "1.0"
 optional = true
 
 [features]
-extrapolation = ["regex"]
+extrapolation = ["regex", "serde"]
+serde = ["envir_derive"]
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
