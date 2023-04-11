@@ -74,6 +74,12 @@ where
         .transpose()
 }
 
+#[must_use]
+pub fn dump() -> HashMap<String, String> {
+    std::env::vars()
+        .collect()
+}
+
 #[macro_export]
 macro_rules! parse {
     ($x:expr, $ty:ty) => {
@@ -205,5 +211,10 @@ mod test {
             Ok(test.config_dir),
             std::env::var("HOME").map(|x| format!("{x}/.config"))
         );
+    }
+
+    #[test]
+    fn dump() {
+        assert!(!crate::dump().is_empty());
     }
 }
