@@ -70,7 +70,7 @@ where
         .or(default.as_ref())
         .map(|x| {
             x.parse::<T>()
-                .map_err(|e| crate::Error::Parse(e.to_string()))
+                .map_err(|e| crate::result::Parse::new::<T, _>(var, e.to_string()))
         })
         .transpose()
 }
@@ -92,8 +92,8 @@ where
     let value = match value.to_str() {
         Some(v) => v
             .parse::<T>()
-            .map_err(|e| crate::Error::Parse(e.to_string()))?,
-        None => return Err(crate::Error::Unicode(value)),
+            .map_err(|e| crate::result::Parse::new::<T, _>(key, e.to_string()))?,
+        None => return Err(crate::result::Unicode::new(key, value)),
     };
 
     Ok(Some(value))
