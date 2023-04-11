@@ -4,13 +4,7 @@ pub type Result<T = ()> = std::result::Result<T, Error>;
 pub enum Error {
     Parse(String),
     Missing(String),
-    Var(std::env::VarError),
-}
-
-impl From<std::env::VarError> for Error {
-    fn from(e: std::env::VarError) -> Self {
-        Self::Var(e)
-    }
+    Unicode(std::ffi::OsString),
 }
 
 impl std::fmt::Display for Error {
@@ -18,7 +12,7 @@ impl std::fmt::Display for Error {
         let s = match self {
             Self::Parse(s) => s.clone(),
             Self::Missing(v) => format!("Missing '{v}' environment variable"),
-            Self::Var(e) => e.to_string(),
+            Self::Unicode(s) => format!("environment variable was not valid unicode: {s:?}"),
         };
 
         write!(f, "{s}")

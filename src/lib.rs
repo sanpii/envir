@@ -77,8 +77,34 @@ where
 
 #[must_use]
 pub fn dump() -> HashMap<String, String> {
-    std::env::vars()
-        .collect()
+    std::env::vars().collect()
+}
+
+#[must_use]
+pub fn try_get<T: std::str::FromStr>(key: &str) -> crate::Result<Option<T>>
+where
+    T::Err: ToString,
+{
+    let Some(value) = std::env::var_os(key) else {
+        return Ok(None);
+    };
+
+    let value = match value.to_str() {
+        Some(v) => v
+            .parse::<T>()
+            .map_err(|e| crate::Error::Parse(e.to_string()))?,
+        None => return Err(crate::Error::Unicode(value)),
+    };
+
+    Ok(Some(value))
+}
+
+#[must_use]
+pub fn get<T: std::str::FromStr>(key: &str) -> crate::Result<T>
+where
+    T::Err: ToString,
+{
+    crate::try_get(key)?.ok_or_else(|| crate::Error::Missing(key.to_string()))
 }
 
 #[macro_export]
@@ -217,5 +243,20 @@ mod test {
     #[test]
     fn dump() {
         assert!(!crate::dump().is_empty());
+    }
+
+    #[test]
+    fn try_get() -> crate::Result {
+        assert!(crate::try_get::<String>("MISSING_ENV")?.is_none());
+
+        Ok(())
+    }
+
+    #[test]
+    fn get() -> crate::Result {
+        std::env::set_var("TEST", "1");
+        assert_eq!(crate::get::<u8>("TEST")?, 1u8);
+
+        Ok(())
     }
 }
