@@ -10,6 +10,9 @@ license = "MIT"
 description = "Deserialize/serialize struct from/to env"
 repository = "https://github.com/sanpii/envir"
 
+[dependencies]
+dotenvy = "0.15"
+
 [dependencies.envir_derive]
 version = "0.1"
 path = "derive/"

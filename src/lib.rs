@@ -95,6 +95,10 @@ where
         .transpose()
 }
 
+pub fn dotenv() {
+    dotenvy::dotenv().ok();
+}
+
 #[must_use]
 pub fn dump() -> HashMap<String, String> {
     std::env::vars().collect()
