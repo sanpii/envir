@@ -7,8 +7,6 @@ mod errors;
 mod serde;
 
 #[cfg(feature = "serde")]
-pub use envir_derive::*;
-#[cfg(feature = "serde")]
 pub use serde::*;
 
 pub use errors::{Error, Result};

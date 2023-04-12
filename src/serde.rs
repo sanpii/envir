@@ -1,3 +1,5 @@
+pub use envir_derive::*;
+
 use std::collections::HashMap;
 
 pub trait Serialize {
