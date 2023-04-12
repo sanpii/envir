@@ -22,7 +22,7 @@ pub fn dump() -> std::collections::HashMap<String, String> {
     std::env::vars().collect()
 }
 
-pub fn try_get<T: std::str::FromStr>(key: &str) -> crate::Result<Option<T>>
+pub fn try_parse<T: std::str::FromStr>(key: &str) -> crate::Result<Option<T>>
 where
     T::Err: ToString,
 {
@@ -40,11 +40,11 @@ where
     Ok(Some(value))
 }
 
-pub fn get<T: std::str::FromStr>(key: &str) -> crate::Result<T>
+pub fn parse<T: std::str::FromStr>(key: &str) -> crate::Result<T>
 where
     T::Err: ToString,
 {
-    crate::try_get(key)?.ok_or_else(|| crate::Error::Missing(key.to_string()))
+    crate::try_parse(key)?.ok_or_else(|| crate::Error::Missing(key.to_string()))
 }
 
 pub fn set<T: ToString>(key: &str, value: T) {
@@ -59,16 +59,16 @@ mod test {
     }
 
     #[test]
-    fn try_get() -> crate::Result {
-        assert!(crate::try_get::<String>("MISSING_ENV")?.is_none());
+    fn try_parse() -> crate::Result {
+        assert!(crate::try_parse::<String>("MISSING_ENV")?.is_none());
 
         Ok(())
     }
 
     #[test]
-    fn get() -> crate::Result {
+    fn parse() -> crate::Result {
         crate::set("TEST", 1);
-        assert_eq!(crate::get::<u8>("TEST")?, 1u8);
+        assert_eq!(crate::parse::<u8>("TEST")?, 1u8);
 
         Ok(())
     }
