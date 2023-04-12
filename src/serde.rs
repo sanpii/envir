@@ -3,7 +3,7 @@ use std::collections::HashMap;
 pub trait Serialize {
     fn export(&self) {
         for (k, v) in self.into() {
-            std::env::set_var(k, v);
+            crate::set(&k, v);
         }
     }
 
@@ -15,7 +15,7 @@ pub trait Deserialize {
     where
         Self: Sized,
     {
-        let env = std::env::vars().collect();
+        let env = crate::dump();
 
         Self::from(&env)
     }
