@@ -26,15 +26,10 @@ pub fn try_parse<T: std::str::FromStr>(key: &str) -> crate::Result<Option<T>>
 where
     T::Err: ToString,
 {
-    let Some(value) = std::env::var_os(key) else {
-        return Ok(None);
-    };
-
-    let value = match value.to_str() {
-        Some(v) => v
-            .parse::<T>()
+    let value = match crate::try_get(key)? {
+        Some(v) => v.parse::<T>()
             .map_err(|e| crate::Error::parse::<T, _>(key, e.to_string()))?,
-        None => return Err(crate::Error::unicode(key, value)),
+        None => return Ok(None),
     };
 
     Ok(Some(value))
@@ -45,6 +40,23 @@ where
     T::Err: ToString,
 {
     crate::try_parse(key)?.ok_or_else(|| crate::Error::Missing(key.to_string()))
+}
+
+pub fn try_get(key: &str) -> crate::Result<Option<String>> {
+    let Some(value) = std::env::var_os(key) else {
+        return Ok(None);
+    };
+
+    let value = match value.to_str() {
+        Some(v) => v.to_string(),
+        None => return Err(crate::Error::unicode(key, value)),
+    };
+
+    Ok(Some(value))
+}
+
+pub fn get(key: &str) -> crate::Result<String> {
+    crate::try_get(key)?.ok_or_else(|| crate::Error::Missing(key.to_string()))
 }
 
 pub fn set<T: ToString>(key: &str, value: T) {
@@ -69,6 +81,21 @@ mod test {
     fn parse() -> crate::Result {
         crate::set("TEST", 1);
         assert_eq!(crate::parse::<u8>("TEST")?, 1u8);
+
+        Ok(())
+    }
+
+    #[test]
+    fn try_get() -> crate::Result {
+        assert!(crate::try_get("MISSING_ENV")?.is_none());
+
+        Ok(())
+    }
+
+    #[test]
+    fn get() -> crate::Result {
+        crate::set("TEST", 1);
+        assert_eq!(crate::get("TEST")?, "1");
 
         Ok(())
     }

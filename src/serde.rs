@@ -74,7 +74,7 @@ where
         let regex = regex::Regex::new(r#"\$\{ *(?P<name>.*?) *\}"#).unwrap();
 
         try_replace(&regex, &x, |caps: &regex::Captures| {
-            crate::parse::<String>(&caps["name"])
+            crate::get(&caps["name"])
         })
         .map(|x| x.to_string())
     }).transpose()?;
