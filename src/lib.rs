@@ -11,7 +11,7 @@ pub use envir_derive::*;
 #[cfg(feature = "serde")]
 pub use serde::*;
 
-pub use errors::{Result, Error};
+pub use errors::{Error, Result};
 
 pub fn dotenv() {
     dotenvy::dotenv().ok();
@@ -27,7 +27,8 @@ where
     T::Err: ToString,
 {
     let value = match crate::try_get(key)? {
-        Some(v) => v.parse::<T>()
+        Some(v) => v
+            .parse::<T>()
             .map_err(|e| crate::Error::parse::<T, _>(key, e.to_string()))?,
         None => return Ok(None),
     };

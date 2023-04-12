@@ -42,9 +42,13 @@ impl std::fmt::Display for Error {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let s = match self {
             Self::Dotenv(error) => error.to_string(),
-            Self::Parse(Parse { key, ty, error }) => format!("Enable to parse '{key}' variable to '{ty}': {error}"),
+            Self::Parse(Parse { key, ty, error }) => {
+                format!("Enable to parse '{key}' variable to '{ty}': {error}")
+            }
             Self::Missing(v) => format!("Missing '{v}' environment variable"),
-            Self::Unicode(Unicode { key, value }) => format!("environment variable '{key}' was not valid unicode: {value:?}"),
+            Self::Unicode(Unicode { key, value }) => {
+                format!("environment variable '{key}' was not valid unicode: {value:?}")
+            }
         };
 
         write!(f, "{s}")

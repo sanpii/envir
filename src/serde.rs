@@ -49,7 +49,11 @@ where
     T::Err: ToString,
 {
     #[cfg(feature = "extrapolation")]
-    fn try_replace<'t, F: FnMut(&regex::Captures) -> crate::Result<String>> (regex: &regex::Regex, text: &'t str, mut rep: F) -> crate::Result<std::borrow::Cow<'t, str>> {
+    fn try_replace<'t, F: FnMut(&regex::Captures) -> crate::Result<String>>(
+        regex: &regex::Regex,
+        text: &'t str,
+        mut rep: F,
+    ) -> crate::Result<std::borrow::Cow<'t, str>> {
         let mut it = regex.captures_iter(text).peekable();
 
         if it.peek().is_none() {
@@ -70,14 +74,16 @@ where
     }
 
     #[cfg(feature = "extrapolation")]
-    let default = default.map(|x| {
-        let regex = regex::Regex::new(r#"\$\{ *(?P<name>.*?) *\}"#).unwrap();
+    let default = default
+        .map(|x| {
+            let regex = regex::Regex::new(r#"\$\{ *(?P<name>.*?) *\}"#).unwrap();
 
-        try_replace(&regex, &x, |caps: &regex::Captures| {
-            crate::get(&caps["name"])
+            try_replace(&regex, &x, |caps: &regex::Captures| {
+                crate::get(&caps["name"])
+            })
+            .map(|x| x.to_string())
         })
-        .map(|x| x.to_string())
-    }).transpose()?;
+        .transpose()?;
 
     env.get(var)
         .or(default.as_ref())
