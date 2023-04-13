@@ -10,8 +10,9 @@ license = "MIT"
 description = "Deserialize/serialize struct from/to env"
 repository = "https://github.com/sanpii/envir"
 
-[dependencies]
-dotenvy = "0.15"
+[dependencies.dotenvy]
+version = "0.15"
+optional = true
 
 [dependencies.envir_derive]
 version = "0.1"
@@ -23,6 +24,8 @@ version = "1.0"
 optional = true
 
 [features]
+default = ["dotenv"]
+dotenv = ["dotenvy"]
 extrapolation = ["regex", "serde"]
 serde = ["envir_derive"]
 

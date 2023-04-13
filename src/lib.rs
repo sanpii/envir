@@ -14,6 +14,8 @@ pub use errors::{Error, Result};
 /**
  * Loads the *.env* files.
  */
+#[cfg(feature = "dotenv")]
+#[cfg_attr(docsrs, doc(cfg(feature = "dotenv")))]
 pub fn dotenv() {
     dotenvy::dotenv().ok();
 }
