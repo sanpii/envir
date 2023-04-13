@@ -4,12 +4,12 @@ use std::collections::HashMap;
 
 pub trait Serialize {
     fn export(&self) {
-        for (k, v) in self.into() {
+        for (k, v) in self.collect() {
             crate::set(&k, v);
         }
     }
 
-    fn into(&self) -> HashMap<String, String>;
+    fn collect(&self) -> HashMap<String, String>;
 }
 
 pub trait Deserialize {

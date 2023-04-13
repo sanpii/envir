@@ -26,7 +26,7 @@ pub(crate) fn impl_macro(ast: &syn::DeriveInput) -> syn::Result<proc_macro2::Tok
     let de = quote::quote! {
         #[automatically_derived]
         impl #impl_generics #envir::Serialize for #name #ty_generics #where_clause {
-            fn into(&self) -> std::collections::HashMap<String, String> {
+            fn collect(&self) -> std::collections::HashMap<String, String> {
                 let mut hash_map = std::collections::HashMap::new();
 
                 #(#export_body; )*
@@ -63,7 +63,7 @@ fn gen_field(
     let gen = if crate::is_option(&field.ty) && field_attr.nested {
         quote::quote! {
             if let Some(ref v) = self.#name {
-                hash_map.extend(#envir::Serialize::into(v));
+                hash_map.extend(#envir::Serialize::collect(v));
             }
         }
     } else if crate::is_option(&field.ty) {
@@ -74,7 +74,7 @@ fn gen_field(
         }
     } else if field_attr.nested {
         quote::quote! {
-            hash_map.extend(#envir::Serialize::into(&self.#name))
+            hash_map.extend(#envir::Serialize::collect(&self.#name))
         }
     } else {
         quote::quote! {
