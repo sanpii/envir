@@ -24,7 +24,7 @@ pub fn dotenv() {
  * Retreives all environment variables as an easy printable form.
  */
 #[must_use]
-pub fn dump() -> std::collections::HashMap<String, String> {
+pub fn collect() -> std::collections::HashMap<String, String> {
     std::env::vars().collect()
 }
 
@@ -89,8 +89,8 @@ pub fn set<T: ToString>(key: &str, value: T) {
 #[cfg(test)]
 mod test {
     #[test]
-    fn dump() {
-        assert!(!crate::dump().is_empty());
+    fn collect() {
+        assert!(!crate::collect().is_empty());
     }
 
     #[test]

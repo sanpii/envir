@@ -17,7 +17,7 @@ pub trait Deserialize {
     where
         Self: Sized,
     {
-        let env = crate::dump();
+        let env = crate::collect();
 
         Self::from(&env)
     }
