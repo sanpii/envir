@@ -15,7 +15,7 @@ version = "0.15"
 optional = true
 
 [dependencies.envir_derive]
-version = "0.1"
+version = "0.2"
 path = "derive/"
 optional = true
 
