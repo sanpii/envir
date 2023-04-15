@@ -1,6 +1,8 @@
 #![warn(warnings)]
 #![cfg_attr(docsrs, feature(doc_cfg))]
 
+#![doc = include_str!("../README.md")]
+
 mod errors;
 #[cfg(feature = "serde")]
 #[cfg_attr(docsrs, doc(cfg(feature = "serde")))]
