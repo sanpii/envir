@@ -31,18 +31,26 @@ The `dotenv` feature adds an eponyme function to load `.env` file.
 The `serde` feature adds macro to deserialize struct from env:
 
 ```
+use envir::Deserialize;
+
 #[derive(envir::Deserialize)]
 struct Config {
 }
 
-let config = envir::from_env()?;
-// or
-let config = Config::from_env()?;
+fn main() -> envir::Result {
+    let config: Config = envir::from_env()?;
+    // or
+    let config = Config::from_env()?;
+
+    Ok(())
+}
 ```
 
 And serialize to env:
 
 ```
+use envir::Serialize;
+
 #[derive(envir::Serialize, Default)]
 struct Config {
 }
@@ -57,7 +65,7 @@ default macro attribute:
 ```
 #[derive(envir::Deserialize)]
 struct Config {
-    #[envir(defaut = "/home/${USER}")]
+    #[envir(default = "/home/${USER}")]
     home: String,
 }
 ```

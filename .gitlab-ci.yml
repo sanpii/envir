@@ -24,7 +24,7 @@ test:
     script: |
         if [[ $MODE == "release" ]]
         then
-            cargo test --release
+            cargo test --all-features --release
         else
-            cargo test "$feature"
+            cargo test --all-features "$feature"
         fi
