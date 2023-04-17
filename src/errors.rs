@@ -2,6 +2,7 @@ pub type Result<T = ()> = std::result::Result<T, Error>;
 
 #[derive(Debug)]
 pub enum Error {
+    #[cfg(feature = "dotenv")]
     Dotenv(dotenvy::Error),
     Parse(Parse),
     Missing(String),
@@ -41,6 +42,7 @@ pub struct Unicode {
 impl std::fmt::Display for Error {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let s = match self {
+            #[cfg(feature = "dotenv")]
             Self::Dotenv(error) => error.to_string(),
             Self::Parse(Parse { key, ty, error }) => {
                 format!("Enable to parse '{key}' variable to '{ty}': {error}")
