@@ -1,5 +1,4 @@
 #![warn(warnings)]
-
 #![doc = include_str!("../README.md")]
 
 mod attr;
