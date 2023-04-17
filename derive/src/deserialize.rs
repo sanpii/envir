@@ -77,10 +77,10 @@ fn gen_field(
         },
         crate::attr::Default::Trait => quote::quote! {
             #name: #envir::load_optional_var(env, #var, None)?
-                .unwrap_or_else(Default::default)
+                .unwrap_or_else(::std::default::Default::default)
         },
         crate::attr::Default::Path(path) => quote::quote! {
-            #name: #envir::load_optional_var(env, #var, Some(#path.to_string()))?
+            #name: #envir::load_optional_var(env, #var, ::std::option::Option::Some(#path.to_string()))?
                 .unwrap()
         },
     };
