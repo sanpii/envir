@@ -48,17 +48,12 @@ pub(crate) struct Field {
     pub nested: bool,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 pub(crate) enum Default {
+    #[default]
     None,
     Trait,
     Path(String),
-}
-
-impl std::default::Default for Default {
-    fn default() -> Self {
-        Self::None
-    }
 }
 
 impl Field {
