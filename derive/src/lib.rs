@@ -4,7 +4,6 @@
 mod attr;
 mod deserialize;
 mod serialize;
-mod symbol;
 
 #[proc_macro_derive(Deserialize, attributes(envir))]
 pub fn deserialize_derive(input: proc_macro::TokenStream) -> proc_macro::TokenStream {

@@ -1,6 +1,8 @@
 pub(crate) fn impl_macro(ast: &syn::DeriveInput) -> syn::Result<proc_macro2::TokenStream> {
-    let attr = crate::attr::Container::from_ast(ast)?;
-    let envir = attr.envir.clone();
+    use darling::FromDeriveInput;
+
+    let attr = crate::attr::Container::from_derive_input(ast).unwrap();
+    let envir = attr.envir();
 
     let fields = match ast.data {
         syn::Data::Struct(ref s) => &s.fields,
@@ -43,8 +45,10 @@ fn gen_field(
     attr: &crate::attr::Container,
     field: &syn::Field,
 ) -> syn::Result<proc_macro2::TokenStream> {
-    let envir = attr.envir.clone();
-    let field_attr = crate::attr::Field::from_ast(field)?;
+    use darling::FromField;
+
+    let envir = attr.envir();
+    let field_attr = crate::attr::Field::from_field(field)?;
     let name = &field.ident;
     let var = format!(
         "{}{}",

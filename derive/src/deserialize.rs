@@ -1,6 +1,8 @@
 pub(crate) fn impl_macro(ast: &syn::DeriveInput) -> syn::Result<proc_macro2::TokenStream> {
-    let attr = crate::attr::Container::from_ast(ast)?;
-    let envir = attr.envir.clone();
+    use darling::FromDeriveInput;
+
+    let attr = crate::attr::Container::from_derive_input(ast).unwrap();
+    let envir = attr.envir();
 
     let fields = match ast.data {
         syn::Data::Struct(ref s) => &s.fields,
@@ -40,8 +42,10 @@ fn gen_field(
     attr: &crate::attr::Container,
     field: &syn::Field,
 ) -> syn::Result<proc_macro2::TokenStream> {
-    let field_attr = crate::attr::Field::from_ast(field)?;
-    let envir = attr.envir.clone();
+    use darling::FromField;
+
+    let field_attr = crate::attr::Field::from_field(field)?;
+    let envir = attr.envir();
     let name = &field.ident;
     let mut var = field_attr
         .name
@@ -71,15 +75,15 @@ fn gen_field(
     }
 
     let gen = match &field_attr.default {
-        crate::attr::Default::None => quote::quote! {
+        None => quote::quote! {
             #name: #envir::load_optional_var(env, #var, None)?
                 .ok_or(#envir::Error::Missing(#var.to_string()))?
         },
-        crate::attr::Default::Trait => quote::quote! {
+        Some(darling::util::Override::Inherit) => quote::quote! {
             #name: #envir::load_optional_var(env, #var, None)?
                 .unwrap_or_else(::std::default::Default::default)
         },
-        crate::attr::Default::Path(path) => quote::quote! {
+        Some(darling::util::Override::Explicit(path)) => quote::quote! {
             #name: #envir::load_optional_var(env, #var, ::std::option::Option::Some(#path.to_string()))?
                 .unwrap()
         },
