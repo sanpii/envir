@@ -3,7 +3,7 @@ members = [".", "derive"]
 
 [package]
 name = "envir"
-version = "0.2.2"
+version = "0.3.0"
 authors = ["Sanpi <sanpi@homecomputing.fr>"]
 edition = "2021"
 license = "MIT"
@@ -19,7 +19,7 @@ version = "0.11"
 optional = true
 
 [dependencies.envir_derive]
-version = "0.2"
+version = "0.3"
 path = "derive/"
 optional = true
 
