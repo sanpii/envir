@@ -4,6 +4,8 @@ pub type Result<T = ()> = std::result::Result<T, Error>;
 pub enum Error {
     #[cfg(feature = "dotenv")]
     Dotenv(dotenvy::Error),
+    #[cfg(feature = "logger")]
+    Logger(String),
     Parse(Parse),
     Missing(String),
     Unicode(Unicode),
@@ -26,6 +28,12 @@ impl Error {
     }
 }
 
+impl From<dotenvy::Error> for Error {
+    fn from(value: dotenvy::Error) -> Self {
+        Self::Dotenv(value)
+    }
+}
+
 #[derive(Debug)]
 pub struct Parse {
     key: String,
@@ -44,6 +52,8 @@ impl std::fmt::Display for Error {
         let s = match self {
             #[cfg(feature = "dotenv")]
             Self::Dotenv(error) => error.to_string(),
+            #[cfg(feature = "logger")]
+            Self::Logger(error) => error.clone(),
             Self::Parse(Parse { key, ty, error }) => {
                 format!("Enable to parse '{key}' variable to '{ty}': {error}")
             }

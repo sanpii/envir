@@ -10,7 +10,35 @@ mod serde;
 #[cfg(feature = "serde")]
 pub use serde::*;
 
+#[cfg(feature = "logger")]
+#[cfg_attr(docsrs, doc(cfg(feature = "logger")))]
+pub use env_logger as logger;
+
 pub use errors::{Error, Result};
+
+/**
+ * Loads the *.env* file and initializes the logger.
+ */
+pub fn init() {
+    #[cfg(feature = "dotenv")]
+    dotenv();
+
+    #[cfg(feature = "logger")]
+    logger::init();
+}
+
+/**
+ * Attempts to load the *.env* file and to initialize the logger.
+ */
+pub fn try_init() -> Result {
+    #[cfg(feature = "dotenv")]
+    dotenvy::dotenv()?;
+
+    #[cfg(feature = "logger")]
+    logger::try_init().map_err(|e| Error::Logger(e.to_string()))?;
+
+    Ok(())
+}
 
 /**
  * Loads the *.env* files.

@@ -26,6 +26,10 @@ print collection.
 
 The `dotenv` feature adds an eponyme function to load `.env` file.
 
+## logger
+
+The `logger` feature adds logger configured via environment variables.
+
 ## serde
 
 The `serde` feature adds macro to deserialize struct from env:
