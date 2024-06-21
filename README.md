@@ -7,14 +7,14 @@ A toolbox to deal with your environment.
 
 ## Basics
 
-Without feature, this crate provide simple functions to retreive the value of an
-environment variable:
+Without feature, this crate provides simple functions to retreive the value of
+an environment variable:
 
 - `get` to retreive as string;
 - `parse` to directly parse the value as a desired type.
 
-The `try_` version of theire functions return `None` if the variable doens’t
-exist when `get` and `parse` return an `Error::Missing` error.
+The `try_` version of these functions return `None` if the variable doens’t
+exist when `get` and `parse` return the `Error::Missing` error.
 
 In addition this crate provide a `set` function, like `std::env::set_var` but
 works for all types implement `ToString`.
