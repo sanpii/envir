@@ -20,7 +20,7 @@ pub use errors::{Error, Result};
  * Loads the *.env* file and initializes the logger.
  */
 pub fn init() {
-    #[cfg(feature = "dotenv")]
+    #[cfg(all(feature = "dotenv", debug_assertions))]
     dotenv();
 
     #[cfg(feature = "logger")]
@@ -31,7 +31,7 @@ pub fn init() {
  * Attempts to load the *.env* file and to initialize the logger.
  */
 pub fn try_init() -> Result {
-    #[cfg(feature = "dotenv")]
+    #[cfg(all(feature = "dotenv", debug_assertions))]
     dotenvy::dotenv()?;
 
     #[cfg(feature = "logger")]
