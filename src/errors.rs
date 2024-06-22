@@ -28,6 +28,7 @@ impl Error {
     }
 }
 
+#[cfg(feature = "dotenv")]
 impl From<dotenvy::Error> for Error {
     fn from(value: dotenvy::Error) -> Self {
         Self::Dotenv(value)
