@@ -20,5 +20,5 @@ version = "2.0"
 features = ["extra-traits"]
 
 [dev-dependencies.envir]
-version = "0.3"
+version = "0.4"
 features = ["serde"]
