@@ -3,8 +3,8 @@
 #![doc = include_str!("../README.md")]
 
 mod errors;
-#[cfg(feature = "logger")]
-#[cfg_attr(docsrs, doc(cfg(feature = "logger")))]
+#[cfg(any(feature = "env_logger", feature = "tracing"))]
+#[cfg_attr(docsrs, doc(cfg(any(feature = "env_logger", feature = "tracing"))))]
 pub mod logger;
 #[cfg(feature = "serde")]
 #[cfg_attr(docsrs, doc(cfg(feature = "serde")))]
