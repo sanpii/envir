@@ -34,7 +34,7 @@ The `logger` feature adds logger configured via environment variables.
 
 The `serde` feature adds macro to deserialize struct from env:
 
-```
+```rust,ignore
 use envir::Deserialize;
 
 #[derive(envir::Deserialize)]
@@ -52,7 +52,7 @@ fn main() -> envir::Result {
 
 And serialize to env:
 
-```
+```rust,ignore
 use envir::Serialize;
 
 #[derive(envir::Serialize, Default)]
@@ -66,7 +66,7 @@ config.export();
 The `extrapolation` feature allows environment variables replacement in the
 default macro attribute:
 
-```
+```rust,ignore
 #[derive(envir::Deserialize)]
 struct Config {
     #[envir(default = "/home/${USER}")]

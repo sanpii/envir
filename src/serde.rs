@@ -101,7 +101,7 @@ mod test {
     #[test]
     fn deserialize() {
         #[derive(Debug, PartialEq, crate::Deserialize)]
-        #[envir(internal, prefix = "ENV_")]
+        #[envir(prefix = "ENV_")]
         struct Test {
             #[envir(name = "FOO")]
             field1: String,
@@ -141,7 +141,7 @@ mod test {
         use crate::Serialize;
 
         #[derive(Debug, PartialEq, crate::Serialize)]
-        #[envir(internal, prefix = "ENV2_")]
+        #[envir(prefix = "ENV2_")]
         struct Test2 {
             #[envir(name = "FOO")]
             field1: String,
@@ -165,14 +165,13 @@ mod test {
     #[test]
     fn nested() {
         #[derive(Debug, PartialEq, crate::Deserialize, crate::Serialize)]
-        #[envir(internal)]
         struct Test3 {
             #[envir(nested)]
             nested: Nested,
         }
 
         #[derive(Debug, PartialEq, crate::Deserialize, crate::Serialize)]
-        #[envir(internal, prefix = "ENV3_")]
+        #[envir(prefix = "ENV3_")]
         struct Nested {
             foo: Option<String>,
         }
@@ -201,7 +200,6 @@ mod test {
     #[cfg(feature = "extrapolation")]
     fn env() {
         #[derive(crate::Deserialize)]
-        #[envir(internal)]
         struct Test4 {
             #[envir(default = "${HOME}/.config")]
             config_dir: String,
@@ -218,7 +216,6 @@ mod test {
     #[cfg(feature = "extrapolation")]
     fn extrapolation_error() {
         #[derive(crate::Deserialize)]
-        #[envir(internal)]
         struct Test {
             #[envir(default = "${MISSING_ENV}/.config")]
             _config_dir: String,
