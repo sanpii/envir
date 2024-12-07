@@ -63,7 +63,12 @@ $ cargo run
 - `load_with`: use this function to load this field. The given function must
     be callable as `fn (Hashmap<String, String>) -> envir::Result<T>`;
 - `noprefix`: doesn’t add the `prefix` for this field;
-- `nested`: this field should be de/serialized recursively.
+- `nested`: this field should be de/serialized recursively;
+- `skip`: skip this field, don’t load or export it;
+- `skip_load`: don’t load this field;
+- `skip_export`: don’t export this field;
+- `skip_export_if`: call a function to determine whether to export this field or
+    not. The given function must be callable as `fn(&T) -> bool`.
 
 ```rust
 use envir::Deserialize;
