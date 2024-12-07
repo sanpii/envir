@@ -1,11 +1,11 @@
 [package]
 name = "envir_derive"
-version = "0.4.2"
-authors = ["Sanpi <sanpi@homecomputing.fr>"]
-edition = "2021"
-license = "MIT"
 description = "Derive macro for envir crate"
-repository = "https://github.com/sanpii/envir"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
 
 [lib]
 proc-macro = true
