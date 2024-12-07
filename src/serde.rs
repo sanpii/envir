@@ -243,4 +243,19 @@ mod test {
 
         assert!(std::env::var("SKIP_EXPORT").is_err());
     }
+
+    #[test]
+    fn skip_load() -> crate::Result {
+        #[derive(crate::Deserialize)]
+        struct Test {
+            #[envir(skip_load)]
+            home: String,
+        }
+
+        let test = crate::from_env::<Test>()?;
+
+        assert!(test.home.is_empty());
+
+        Ok(())
+    }
 }
