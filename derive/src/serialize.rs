@@ -16,11 +16,10 @@ pub(crate) fn impl_macro(ast: &syn::DeriveInput) -> syn::Result<proc_macro2::Tok
         );
     }
 
-    let mut export_body = Vec::new();
-
-    for field in fields {
-        export_body.push(gen_field(&attr, field)?);
-    }
+    let export_body = fields
+        .iter()
+        .map(|x| gen_field(&attr, x))
+        .collect::<Result<Vec<_>, _>>()?;
 
     let name = &ast.ident;
     let (impl_generics, ty_generics, where_clause) = ast.generics.split_for_impl();
