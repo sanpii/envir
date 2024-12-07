@@ -32,4 +32,6 @@ pub(crate) struct Field {
     pub noprefix: bool,
     #[darling(default)]
     pub nested: bool,
+    #[darling(default)]
+    pub skip_export: bool,
 }

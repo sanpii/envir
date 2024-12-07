@@ -44,11 +44,16 @@ pub(crate) fn impl_macro(ast: &syn::DeriveInput) -> syn::Result<proc_macro2::Tok
 fn gen_field(
     attr: &crate::attr::Container,
     field: &syn::Field,
-) -> syn::Result<proc_macro2::TokenStream> {
+) -> syn::Result<Option<proc_macro2::TokenStream>> {
     use darling::FromField;
 
     let envir = attr.envir();
     let field_attr = crate::attr::Field::from_field(field)?;
+
+    if field_attr.skip_export {
+        return Ok(None);
+    }
+
     let name = &field.ident;
     let var = format!(
         "{}{}",
@@ -59,9 +64,9 @@ fn gen_field(
     );
 
     if let Some(export_with) = field_attr.export_with {
-        return Ok(quote::quote! {
+        return Ok(Some(quote::quote! {
             hash_map.extend(#export_with(&self.#name));
-        });
+        }));
     }
 
     let gen = if crate::is_option(&field.ty) && field_attr.nested {
@@ -86,5 +91,5 @@ fn gen_field(
         }
     };
 
-    Ok(gen)
+    Ok(Some(gen))
 }

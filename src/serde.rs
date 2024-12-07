@@ -223,4 +223,24 @@ mod test {
 
         assert!(crate::from_env::<Test>().is_err());
     }
+
+    #[test]
+    fn skip_export() {
+        use crate::Serialize as _;
+
+        #[derive(crate::Serialize)]
+        struct Test {
+            #[envir(skip_export)]
+            #[allow(dead_code)]
+            skip_export: String,
+        }
+
+        let test = Test {
+            skip_export: "skip".to_string(),
+        };
+
+        test.export();
+
+        assert!(std::env::var("SKIP_EXPORT").is_err());
+    }
 }
