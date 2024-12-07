@@ -25,8 +25,8 @@ impl Container {
 pub(crate) struct Field {
     #[darling(default)]
     pub default: Option<darling::util::Override<String>>,
-    pub export_with: Option<syn::Ident>,
-    pub load_with: Option<syn::Ident>,
+    pub export_with: Option<syn::ExprPath>,
+    pub load_with: Option<syn::ExprPath>,
     pub name: Option<String>,
     #[darling(default)]
     pub noprefix: bool,
