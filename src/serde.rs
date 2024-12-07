@@ -279,4 +279,25 @@ mod test {
 
         Ok(())
     }
+
+    #[test]
+    fn skip_export_if() -> crate::Result {
+        use crate::Serialize as _;
+
+        #[derive(Default, crate::Serialize)]
+        struct Test {
+            #[envir(skip_export_if = "String::is_empty")]
+            skip: String,
+        }
+
+        let test = Test {
+            skip: "skip_if_empty".to_string(),
+        };
+
+        test.export();
+
+        assert!(std::env::var("SKIP_IF_EMPTY").is_err());
+
+        Ok(())
+    }
 }

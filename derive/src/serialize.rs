@@ -62,13 +62,11 @@ fn gen_field(
             .unwrap_or_else(|| field.ident.as_ref().unwrap().to_string().to_uppercase())
     );
 
-    if let Some(export_with) = field_attr.export_with {
+    let mut gen = if let Some(export_with) = field_attr.export_with {
         return Ok(Some(quote::quote! {
             hash_map.extend(#export_with(&self.#name));
         }));
-    }
-
-    let gen = if crate::is_option(&field.ty) && field_attr.nested {
+    } else if crate::is_option(&field.ty) && field_attr.nested {
         quote::quote! {
             if let ::std::option::Option::Some(ref v) = self.#name {
                 hash_map.extend(#envir::Serialize::collect(v));
@@ -89,6 +87,14 @@ fn gen_field(
             hash_map.insert(#var.to_string(), self.#name.to_string())
         }
     };
+
+    if let Some(skip_export_if) = field_attr.skip_export_if {
+        gen = quote::quote! {
+            if !#skip_export_if(&self.#name) {
+                #gen;
+            }
+        }
+    }
 
     Ok(Some(gen))
 }
