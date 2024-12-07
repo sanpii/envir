@@ -36,4 +36,6 @@ pub(crate) struct Field {
     pub skip_export: bool,
     #[darling(default)]
     pub skip_load: bool,
+    #[darling(default)]
+    pub skip: bool,
 }

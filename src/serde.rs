@@ -258,4 +258,25 @@ mod test {
 
         Ok(())
     }
+
+    #[test]
+    fn skip() -> crate::Result {
+        use crate::Serialize as _;
+
+        #[derive(crate::Deserialize, crate::Serialize)]
+        struct Test {
+            #[envir(skip)]
+            home: String,
+        }
+
+        let test = crate::from_env::<Test>()?;
+
+        assert!(test.home.is_empty());
+
+        test.export();
+
+        assert!(!std::env::var("HOME").unwrap().is_empty());
+
+        Ok(())
+    }
 }

@@ -56,7 +56,7 @@ fn gen_field(
         var.insert_str(0, attr.prefix.as_deref().unwrap_or(""));
     }
 
-    if field_attr.skip_load {
+    if field_attr.skip || field_attr.skip_load {
         return Ok(quote::quote! {
             #name: Default::default()
         });

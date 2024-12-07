@@ -49,7 +49,7 @@ fn gen_field(
     let envir = attr.envir();
     let field_attr = crate::attr::Field::from_field(field)?;
 
-    if field_attr.skip_export {
+    if field_attr.skip || field_attr.skip_export {
         return Ok(None);
     }
 
