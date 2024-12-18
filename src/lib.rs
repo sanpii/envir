@@ -1,13 +1,11 @@
 #![warn(warnings)]
-#![cfg_attr(docsrs, feature(doc_cfg))]
+#![cfg_attr(docsrs, feature(doc_cfg, doc_auto_cfg))]
 #![doc = include_str!("../README.md")]
 
 mod errors;
 #[cfg(any(feature = "env_logger", feature = "tracing"))]
-#[cfg_attr(docsrs, doc(cfg(any(feature = "env_logger", feature = "tracing"))))]
 pub mod logger;
 #[cfg(feature = "serde")]
-#[cfg_attr(docsrs, doc(cfg(feature = "serde")))]
 mod serde;
 
 #[cfg(feature = "serde")]
@@ -43,7 +41,6 @@ pub fn try_init() -> Result {
  * Loads the *.env* files.
  */
 #[cfg(feature = "dotenv")]
-#[cfg_attr(docsrs, doc(cfg(feature = "dotenv")))]
 pub fn dotenv() {
     dotenvy::dotenv().ok();
 }
