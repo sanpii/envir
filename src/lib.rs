@@ -46,6 +46,14 @@ pub fn dotenv() {
 }
 
 /**
+ * Loads environment variables from the specified path.
+ */
+#[cfg(feature = "dotenv")]
+pub fn from_path<P: AsRef<std::path::Path>>(path: P) -> Result {
+    dotenvy::from_path(path).map_err(Into::into)
+}
+
+/**
  * Retreives all environment variables as an easy printable form.
  */
 #[must_use]
