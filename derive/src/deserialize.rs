@@ -80,7 +80,7 @@ fn gen_field(
         });
     }
 
-    let gen = match &field_attr.default {
+    let r#gen = match &field_attr.default {
         None => quote::quote! {
             #name: #envir::load_optional_var(env, #var, None)?
                 .ok_or(#envir::Error::Missing(#var.to_string()))?
@@ -95,5 +95,5 @@ fn gen_field(
         },
     };
 
-    Ok(gen)
+    Ok(r#gen)
 }

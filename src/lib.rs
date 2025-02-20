@@ -116,7 +116,9 @@ pub fn get(key: &str) -> crate::Result<String> {
  * Sets the environment variable `key` to the `value`.
  */
 pub fn set<T: ToString>(key: &str, value: T) {
-    std::env::set_var(key, value.to_string());
+    unsafe {
+        std::env::set_var(key, value.to_string());
+    }
 }
 
 #[cfg(test)]

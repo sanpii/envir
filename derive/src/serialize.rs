@@ -62,7 +62,7 @@ fn gen_field(
             .unwrap_or_else(|| field.ident.as_ref().unwrap().to_string().to_uppercase())
     );
 
-    let mut gen = if let Some(export_with) = field_attr.export_with {
+    let mut r#gen = if let Some(export_with) = field_attr.export_with {
         return Ok(Some(quote::quote! {
             hash_map.extend(#export_with(&self.#name));
         }));
@@ -89,12 +89,12 @@ fn gen_field(
     };
 
     if let Some(skip_export_if) = field_attr.skip_export_if {
-        gen = quote::quote! {
+        r#gen = quote::quote! {
             if !#skip_export_if(&self.#name) {
-                #gen;
+                #r#gen;
             }
         }
     }
 
-    Ok(Some(gen))
+    Ok(Some(r#gen))
 }
