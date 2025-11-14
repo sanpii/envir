@@ -80,23 +80,25 @@ fn gen_field(
         quote::quote! { load_optional_var }
     };
 
+    let separator = field_attr.separator.unwrap_or(',');
+
     if crate::is_option(&field.ty) {
         return Ok(quote::quote! {
-            #name: #envir::#load(env, #var, None)?
+            #name: #envir::#load(env, #var, None, #separator)?
         });
     }
 
     let r#gen = match &field_attr.default {
         None => quote::quote! {
-            #name: #envir::#load(env, #var, None)?
+            #name: #envir::#load(env, #var, None, #separator)?
                 .ok_or(#envir::Error::Missing(#var.to_string()))?
         },
         Some(darling::util::Override::Inherit) => quote::quote! {
-            #name: #envir::#load(env, #var, None)?
+            #name: #envir::#load(env, #var, None, #separator)?
                 .unwrap_or_else(::std::default::Default::default)
         },
         Some(darling::util::Override::Explicit(path)) => quote::quote! {
-            #name: #envir::#load(env, #var, ::std::option::Option::Some(#path.to_string()))?
+            #name: #envir::#load(env, #var, ::std::option::Option::Some(#path.to_string()), #separator)?
                 .unwrap()
         },
     };

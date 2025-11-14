@@ -39,4 +39,5 @@ pub(crate) struct Field {
     #[darling(default)]
     pub skip: bool,
     pub skip_export_if: Option<syn::ExprPath>,
+    pub separator: Option<char>,
 }
