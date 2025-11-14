@@ -28,6 +28,14 @@ pub(crate) fn error<R>(ast: &dyn quote::ToTokens, message: &str) -> syn::Result<
 }
 
 pub(crate) fn is_option(ty: &syn::Type) -> bool {
+    is_ty(ty, "Option")
+}
+
+pub(crate) fn is_vec(ty: &syn::Type) -> bool {
+    is_ty(ty, "Vec")
+}
+
+pub(crate) fn is_ty(ty: &syn::Type, expected: &str) -> bool {
     let syn::Type::Path(typepath) = ty else {
         return false;
     };
@@ -40,5 +48,5 @@ pub(crate) fn is_option(ty: &syn::Type) -> bool {
             .iter()
             .next()
             .map(|x| x.ident.to_string())
-            == Some("Option".to_string())
+            == Some(expected.to_string())
 }

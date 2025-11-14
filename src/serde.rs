@@ -89,11 +89,31 @@ where
 
     env.get(var)
         .or(default.as_ref())
-        .map(|x| {
-            x.parse::<T>()
-                .map_err(|e| crate::Error::parse::<T, _>(var, e.to_string()))
-        })
+        .map(|x| parse(var, x))
         .transpose()
+}
+
+#[doc(hidden)]
+pub fn load_vec<T: std::str::FromStr>(
+    env: &HashMap<String, String>,
+    var: &str,
+    default: Option<String>,
+) -> crate::Result<Option<Vec<T>>>
+where
+    T::Err: ToString,
+{
+    env.get(var)
+        .or(default.as_ref())
+        .map(|x| x.split(',').map(|x| parse(var, x)).collect())
+        .transpose()
+}
+
+fn parse<T: std::str::FromStr>(var: &str, value: &str) -> crate::Result<T>
+where
+    T::Err: ToString,
+{
+    value.parse::<T>()
+        .map_err(|e| crate::Error::parse::<T, _>(var, e.to_string()))
 }
 
 #[cfg(test)]
@@ -113,6 +133,7 @@ mod test {
             #[envir(load_with = "load_field5")]
             field5: String,
             field6: Option<char>,
+            field7: Vec<String>,
         }
 
         fn load_field5(_: &std::collections::HashMap<String, String>) -> crate::Result<String> {
@@ -121,6 +142,7 @@ mod test {
 
         crate::set("ENV_FOO", "foo");
         crate::set("ENV_FIELD4", 4);
+        crate::set("ENV_FIELD7", "value1,value2");
 
         let test = crate::from_env::<Test>().unwrap();
         assert_eq!(
@@ -132,6 +154,7 @@ mod test {
                 field4: 4,
                 field5: "field5".to_string(),
                 field6: None,
+                field7: vec!["value1".to_string(), "value2".to_string()],
             }
         );
     }

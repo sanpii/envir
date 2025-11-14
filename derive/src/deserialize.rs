@@ -74,23 +74,29 @@ fn gen_field(
         });
     }
 
+    let load = if crate::is_vec(&field.ty) {
+        quote::quote! { load_vec }
+    } else {
+        quote::quote! { load_optional_var }
+    };
+
     if crate::is_option(&field.ty) {
         return Ok(quote::quote! {
-            #name: #envir::load_optional_var(env, #var, None)?
+            #name: #envir::#load(env, #var, None)?
         });
     }
 
     let r#gen = match &field_attr.default {
         None => quote::quote! {
-            #name: #envir::load_optional_var(env, #var, None)?
+            #name: #envir::#load(env, #var, None)?
                 .ok_or(#envir::Error::Missing(#var.to_string()))?
         },
         Some(darling::util::Override::Inherit) => quote::quote! {
-            #name: #envir::load_optional_var(env, #var, None)?
+            #name: #envir::#load(env, #var, None)?
                 .unwrap_or_else(::std::default::Default::default)
         },
         Some(darling::util::Override::Explicit(path)) => quote::quote! {
-            #name: #envir::load_optional_var(env, #var, ::std::option::Option::Some(#path.to_string()))?
+            #name: #envir::#load(env, #var, ::std::option::Option::Some(#path.to_string()))?
                 .unwrap()
         },
     };
