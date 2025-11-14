@@ -176,20 +176,32 @@ mod test {
             #[envir(name = "FOO")]
             field1: String,
             field2: String,
+            field3: Vec<String>,
+            #[envir(separator = ';')]
+            field4: Vec<usize>,
         }
 
         let test = Test2 {
             field1: "field1".to_string(),
             field2: "field2".to_string(),
+            field3: vec!["value1".to_string(), "value2".to_string()],
+            field4: vec![1, 2],
         };
 
         assert!(std::env::var("ENV2_FOO").is_err());
         assert!(std::env::var("ENV2_FIELD2").is_err());
+        assert!(std::env::var("ENV2_FIELD3").is_err());
+        assert!(std::env::var("ENV2_FIELD3").is_err());
 
         test.export();
 
         assert_eq!(std::env::var("ENV2_FOO"), Ok("field1".to_string()));
         assert_eq!(std::env::var("ENV2_FIELD2"), Ok("field2".to_string()));
+        assert_eq!(
+            std::env::var("ENV2_FIELD3"),
+            Ok("value1,value2".to_string())
+        );
+        assert_eq!(std::env::var("ENV2_FIELD4"), Ok("1;2".to_string()));
     }
 
     #[test]

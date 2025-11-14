@@ -62,6 +62,8 @@ fn gen_field(
             .unwrap_or_else(|| field.ident.as_ref().unwrap().to_string().to_uppercase())
     );
 
+    let separator = field_attr.separator.unwrap_or(',');
+
     let mut r#gen = if let Some(export_with) = field_attr.export_with {
         return Ok(Some(quote::quote! {
             hash_map.extend(#export_with(&self.#name));
@@ -71,6 +73,16 @@ fn gen_field(
             if let ::std::option::Option::Some(ref v) = self.#name {
                 hash_map.extend(#envir::Serialize::collect(v));
             }
+        }
+    } else if crate::is_option(&field.ty) && crate::is_vec(&field.ty) {
+        quote::quote! {
+            if let ::std::option::Option::Some(ref v) = self.#name {
+                hash_map.insert(#var.to_string(), v.iter().map(|x| x.to_string()).collect::<::std::vec::Vec<_>>().join(&#separator.to_string()));
+            }
+        }
+    } else if crate::is_vec(&field.ty) {
+        quote::quote! {
+            hash_map.insert(#var.to_string(), self.#name.iter().map(|x| x.to_string()).collect::<::std::vec::Vec<_>>().join(&#separator.to_string()));
         }
     } else if crate::is_option(&field.ty) {
         quote::quote! {
