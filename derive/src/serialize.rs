@@ -74,7 +74,7 @@ fn gen_field(
                 hash_map.extend(#envir::Serialize::collect(v));
             }
         }
-    } else if crate::is_option(&field.ty) && crate::is_vec(&field.ty) {
+    } else if crate::is_option_vec(&field.ty) {
         quote::quote! {
             if let ::std::option::Option::Some(ref v) = self.#name {
                 hash_map.insert(#var.to_string(), v.iter().map(|x| x.to_string()).collect::<::std::vec::Vec<_>>().join(&#separator.to_string()));

@@ -42,7 +42,7 @@ where
 }
 
 #[doc(hidden)]
-pub fn load_optional_var<T: std::str::FromStr>(
+pub fn load_option<T: std::str::FromStr>(
     env: &HashMap<String, String>,
     var: &str,
     default: Option<String>,
@@ -139,6 +139,7 @@ mod test {
             field7: Vec<String>,
             #[envir(separator = ';')]
             field8: Vec<usize>,
+            field9: Option<Vec<String>>,
         }
 
         fn load_field5(_: &std::collections::HashMap<String, String>) -> crate::Result<String> {
@@ -162,6 +163,7 @@ mod test {
                 field6: None,
                 field7: vec!["value1".to_string(), "value2".to_string()],
                 field8: vec![1, 2],
+                field9: None,
             }
         );
     }
@@ -179,6 +181,7 @@ mod test {
             field3: Vec<String>,
             #[envir(separator = ';')]
             field4: Vec<usize>,
+            field5: Option<Vec<String>>,
         }
 
         let test = Test2 {
@@ -186,12 +189,14 @@ mod test {
             field2: "field2".to_string(),
             field3: vec!["value1".to_string(), "value2".to_string()],
             field4: vec![1, 2],
+            field5: None,
         };
 
         assert!(std::env::var("ENV2_FOO").is_err());
         assert!(std::env::var("ENV2_FIELD2").is_err());
         assert!(std::env::var("ENV2_FIELD3").is_err());
         assert!(std::env::var("ENV2_FIELD3").is_err());
+        assert!(std::env::var("ENV2_FIELD5").is_err());
 
         test.export();
 
@@ -202,6 +207,7 @@ mod test {
             Ok("value1,value2".to_string())
         );
         assert_eq!(std::env::var("ENV2_FIELD4"), Ok("1;2".to_string()));
+        assert!(std::env::var("ENV2_FIELD5").is_err());
     }
 
     #[test]

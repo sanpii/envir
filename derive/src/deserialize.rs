@@ -74,10 +74,10 @@ fn gen_field(
         });
     }
 
-    let load = if crate::is_vec(&field.ty) {
+    let load = if crate::is_vec(&field.ty) || crate::is_option_vec(&field.ty) {
         quote::quote! { load_vec }
     } else {
-        quote::quote! { load_optional_var }
+        quote::quote! { load_option }
     };
 
     let separator = field_attr.separator.unwrap_or(',');
