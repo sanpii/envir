@@ -1,9 +1,7 @@
-#[cfg_attr(feature = "serde", deprecated(note = "use `derive` feature instead"))]
 pub use envir_derive::*;
 
 use std::collections::HashMap;
 
-#[cfg_attr(feature = "serde", deprecated(note = "use `derive` feature instead"))]
 pub trait Serialize {
     fn export(&self) {
         for (k, v) in self.collect() {
@@ -14,7 +12,6 @@ pub trait Serialize {
     fn collect(&self) -> HashMap<String, String>;
 }
 
-#[cfg_attr(feature = "serde", deprecated(note = "use `derive` feature instead"))]
 pub trait Deserialize {
     fn from_env() -> crate::Result<Self>
     where
@@ -30,7 +27,6 @@ pub trait Deserialize {
         Self: Sized;
 }
 
-#[cfg_attr(feature = "serde", deprecated(note = "use `derive` feature instead"))]
 pub fn from_env<T>() -> crate::Result<T>
 where
     T: Deserialize,
@@ -38,7 +34,6 @@ where
     T::from_env()
 }
 
-#[cfg_attr(feature = "serde", deprecated(note = "use `derive` feature instead"))]
 pub fn from<T>(env: &HashMap<String, String>) -> crate::Result<T>
 where
     T: Deserialize,

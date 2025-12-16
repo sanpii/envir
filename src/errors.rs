@@ -25,6 +25,9 @@ pub enum Error {
     },
     #[error("Missing '{0}' environment variable")]
     Missing(String),
+    #[cfg(feature = "serde")]
+    #[error("{0}")]
+    Serde(#[from] serde_envfile::Error),
     #[error("environment variable '{key}' was not valid unicode: {value:?}")]
     Unicode {
         key: String,

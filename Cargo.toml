@@ -33,7 +33,15 @@ version = "1.0"
 path = "derive/"
 optional = true
 
+[dependencies.serde-envfile]
+version = "0.3"
+optional = true
+
 [dependencies.regex]
+version = "1.0"
+optional = true
+
+[dependencies.serde]
 version = "1.0"
 optional = true
 
@@ -49,7 +57,7 @@ derive = ["envir_derive"]
 dotenv = ["dotenvy"]
 extrapolation = ["regex", "derive"]
 logger = ["env_logger"]
-serde = ["derive"]
+serde = ["dep:serde", "serde-envfile"]
 tracing = ["tracing-subscriber"]
 
 [package.metadata.docs.rs]

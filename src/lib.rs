@@ -7,6 +7,8 @@ mod derive;
 mod errors;
 #[cfg(any(feature = "env_logger", feature = "tracing"))]
 pub mod logger;
+#[cfg(feature = "serde")]
+pub mod serde;
 
 #[cfg(feature = "derive")]
 pub use derive::*;
