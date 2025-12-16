@@ -2,14 +2,14 @@
 #![cfg_attr(docsrs, feature(doc_cfg))]
 #![doc = include_str!("../README.md")]
 
+#[cfg(feature = "derive")]
+mod derive;
 mod errors;
 #[cfg(any(feature = "env_logger", feature = "tracing"))]
 pub mod logger;
-#[cfg(feature = "serde")]
-mod serde;
 
-#[cfg(feature = "serde")]
-pub use serde::*;
+#[cfg(feature = "derive")]
+pub use derive::*;
 
 pub use errors::{Error, Result};
 

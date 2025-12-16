@@ -45,10 +45,11 @@ optional = true
 
 [features]
 default = ["dotenv", "logger"]
+derive = ["envir_derive"]
 dotenv = ["dotenvy"]
+extrapolation = ["regex", "derive"]
 logger = ["env_logger"]
-extrapolation = ["regex", "serde"]
-serde = ["envir_derive"]
+serde = ["derive"]
 tracing = ["tracing-subscriber"]
 
 [package.metadata.docs.rs]
