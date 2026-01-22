@@ -77,16 +77,22 @@ where
     }
 
     #[cfg(feature = "extrapolation")]
-    let default = default
-        .map(|x| {
-            let regex = regex::Regex::new(r#"\$\{ *(?P<name>.*?) *\}"#).unwrap();
+    let default = {
+        static REGEX: std::sync::OnceLock<regex::Regex> = std::sync::OnceLock::new();
+        // @FIXME once_cell_try feature
+        let regex = REGEX.get_or_init(||
+            regex::Regex::new(r#"\$\{ *(?P<name>.*?) *\}"#).unwrap()
+        );
 
-            try_replace(&regex, &x, |caps: &regex::Captures| {
-                crate::get(&caps["name"])
+        default
+            .map(|x| {
+                try_replace(&regex, &x, |caps: &regex::Captures| {
+                    crate::get(&caps["name"])
+                })
+                .map(|x| x.to_string())
             })
-            .map(|x| x.to_string())
-        })
-        .transpose()?;
+            .transpose()?
+    };
 
     env.get(var)
         .or(default.as_ref())
