@@ -81,13 +81,30 @@ where
         static REGEX: std::sync::OnceLock<regex::Regex> = std::sync::OnceLock::new();
         // @FIXME once_cell_try feature
         let regex = REGEX.get_or_init(||
-            regex::Regex::new(r#"\$\{ *(?P<name>.*?) *\}"#).unwrap()
+            regex::Regex::new(r#"(\$\{ *(?P<name>.*?) *\})|(\$\( *(?P<cmd>.*?) *\))"#).unwrap()
         );
 
         default
             .map(|x| {
                 try_replace(&regex, &x, |caps: &regex::Captures| {
-                    crate::get(&caps["name"])
+                    let content = if let Some(name) = caps.name("name") {
+                        crate::get(name.as_str())?
+                    } else if let Some(cmd) = caps.name("cmd") {
+                        let output = std::process::Command::new("sh")
+                            .arg("-c")
+                            .arg(cmd.as_str())
+                            .output()?;
+
+                        if output.status.success() {
+                            String::from_utf8_lossy(&output.stdout).into_owned()
+                        } else {
+                            return Err(crate::Error::Command(cmd.as_str().to_string(), output));
+                        }
+                    } else {
+                        unreachable!()
+                    };
+
+                    Ok(content)
                 })
                 .map(|x| x.to_string())
             })
@@ -253,16 +270,22 @@ mod test {
     #[test]
     #[cfg_attr(not(feature = "extrapolation"), ignore = "feature `extrapolation` is disable")]
     fn env() {
-        #[derive(crate::Deserialize)]
+        #[derive(Debug, PartialEq, crate::Deserialize)]
         struct Test4 {
             #[envir(default = "${HOME}/.config")]
             config_dir: String,
+            #[envir(default = "$(echo test)")]
+            config_content: String,
         }
 
         let test = crate::from_env::<Test4>().unwrap();
+
         assert_eq!(
-            Ok(test.config_dir),
-            std::env::var("HOME").map(|x| format!("{x}/.config"))
+            test,
+            Test4 {
+                config_dir: format!("{}/.config", std::env::var("HOME").unwrap()),
+                config_content: "test\n".to_string(),
+            }
         );
     }
 
@@ -276,6 +299,14 @@ mod test {
         }
 
         assert!(crate::from_env::<Test>().is_err());
+
+        #[derive(Debug, crate::Deserialize)]
+        struct Test2 {
+            #[envir(default = "$(cat ~/.config)")]
+            _config_content: String,
+        }
+
+        assert!(crate::from_env::<Test2>().is_err());
     }
 
     #[test]

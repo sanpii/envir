@@ -2,8 +2,12 @@ pub type Result<T = ()> = std::result::Result<T, Error>;
 
 #[derive(Debug)]
 pub enum Error {
+    #[cfg(feature = "extrapolation")]
+    Command(String, std::process::Output),
     #[cfg(feature = "dotenv")]
     Dotenv(dotenvy::Error),
+    #[cfg(feature = "extrapolation")]
+    Io(std::io::Error),
     #[cfg(feature = "logger")]
     Logger(String),
     Parse(Parse),
@@ -35,6 +39,13 @@ impl From<dotenvy::Error> for Error {
     }
 }
 
+#[cfg(feature = "extrapolation")]
+impl From<std::io::Error> for Error {
+    fn from(value: std::io::Error) -> Self {
+        Self::Io(value)
+    }
+}
+
 #[derive(Debug)]
 pub struct Parse {
     key: String,
@@ -51,8 +62,12 @@ pub struct Unicode {
 impl std::fmt::Display for Error {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let s = match self {
+            #[cfg(feature = "extrapolation")]
+            Self::Command(command, output) => format!("Command '{command}' failed: {output:?}"),
             #[cfg(feature = "dotenv")]
             Self::Dotenv(error) => error.to_string(),
+            #[cfg(feature = "extrapolation")]
+            Self::Io(error) => error.to_string(),
             #[cfg(feature = "logger")]
             Self::Logger(error) => error.clone(),
             Self::Parse(Parse { key, ty, error }) => {

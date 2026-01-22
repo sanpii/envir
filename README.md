@@ -63,14 +63,16 @@ let config = Config::default();
 config.export();
 ```
 
-The `extrapolation` feature allows environment variables replacement in the
-default macro attribute:
+The `extrapolation` feature allows environment variables replacement and command
+output in the default macro attribute:
 
 ```rust,ignore
 #[derive(envir::Deserialize)]
 struct Config {
     #[envir(default = "/home/${USER}")]
     home: String,
+    #[envir(default = "$(pwd)")]
+    pwd: String,
 }
 ```
 
