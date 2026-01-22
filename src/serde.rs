@@ -80,9 +80,9 @@ where
     let default = {
         static REGEX: std::sync::OnceLock<regex::Regex> = std::sync::OnceLock::new();
         // @FIXME once_cell_try feature
-        let regex = REGEX.get_or_init(||
+        let regex = REGEX.get_or_init(|| {
             regex::Regex::new(r#"(\$\{ *(?P<name>.*?) *\})|(\$\( *(?P<cmd>.*?) *\))"#).unwrap()
-        );
+        });
 
         default
             .map(|x| {
@@ -271,7 +271,10 @@ mod test {
     }
 
     #[test]
-    #[cfg_attr(not(feature = "extrapolation"), ignore = "feature `extrapolation` is disable")]
+    #[cfg_attr(
+        not(feature = "extrapolation"),
+        ignore = "feature `extrapolation` is disable"
+    )]
     fn env() {
         #[derive(Debug, PartialEq, crate::Deserialize)]
         struct Test4 {
@@ -293,7 +296,10 @@ mod test {
     }
 
     #[test]
-    #[cfg_attr(not(feature = "extrapolation"), ignore = "feature `extrapolation` is disable")]
+    #[cfg_attr(
+        not(feature = "extrapolation"),
+        ignore = "feature `extrapolation` is disable"
+    )]
     fn extrapolation_error() {
         #[derive(crate::Deserialize)]
         struct Test {
