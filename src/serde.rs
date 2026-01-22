@@ -245,7 +245,7 @@ mod test {
     }
 
     #[test]
-    #[cfg(feature = "extrapolation")]
+    #[cfg_attr(not(feature = "extrapolation"), ignore = "feature `extrapolation` is disable")]
     fn env() {
         #[derive(crate::Deserialize)]
         struct Test4 {
@@ -261,7 +261,7 @@ mod test {
     }
 
     #[test]
-    #[cfg(feature = "extrapolation")]
+    #[cfg_attr(not(feature = "extrapolation"), ignore = "feature `extrapolation` is disable")]
     fn extrapolation_error() {
         #[derive(crate::Deserialize)]
         struct Test {
