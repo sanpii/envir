@@ -17,6 +17,9 @@ edition.workspace = true
 license.workspace = true
 repository.workspace = true
 
+[dependencies]
+thiserror = "2.0"
+
 [dependencies.dotenvy]
 version = "0.15"
 optional = true

@@ -98,7 +98,10 @@ where
                         if output.status.success() {
                             String::from_utf8_lossy(&output.stdout).into_owned()
                         } else {
-                            return Err(crate::Error::Command(cmd.as_str().to_string(), output));
+                            return Err(crate::Error::Command {
+                                command: cmd.as_str().to_string(),
+                                output,
+                            });
                         }
                     } else {
                         unreachable!()

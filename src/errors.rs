@@ -1,86 +1,50 @@
 pub type Result<T = ()> = std::result::Result<T, Error>;
 
-#[derive(Debug)]
+#[derive(Debug, thiserror::Error)]
 pub enum Error {
     #[cfg(feature = "extrapolation")]
-    Command(String, std::process::Output),
+    #[error("Command '{command}' failed: {output:?}")]
+    Command {
+        command: String,
+        output: std::process::Output,
+    },
     #[cfg(feature = "dotenv")]
-    Dotenv(dotenvy::Error),
+    #[error("{0}")]
+    Dotenv(#[from] dotenvy::Error),
     #[cfg(feature = "extrapolation")]
-    Io(std::io::Error),
+    #[error("{0}")]
+    Io(#[from] std::io::Error),
     #[cfg(feature = "logger")]
+    #[error("{0}")]
     Logger(String),
-    Parse(Parse),
+    #[error("Enable to parse '{key}' variable to '{ty}': {error}")]
+    Parse {
+        key: String,
+        ty: String,
+        error: String,
+    },
+    #[error("Missing '{0}' environment variable")]
     Missing(String),
-    Unicode(Unicode),
+    #[error("environment variable '{key}' was not valid unicode: {value:?}")]
+    Unicode {
+        key: String,
+        value: std::ffi::OsString,
+    },
 }
 
 impl Error {
     pub(crate) fn parse<T, E: ToString>(key: &str, error: E) -> Self {
-        Self::Parse(Parse {
+        Self::Parse {
             key: key.to_string(),
             ty: std::any::type_name::<T>().to_string(),
             error: error.to_string(),
-        })
+        }
     }
 
     pub(crate) fn unicode(key: &str, value: std::ffi::OsString) -> Self {
-        Self::Unicode(Unicode {
+        Self::Unicode {
             key: key.to_string(),
             value,
-        })
+        }
     }
 }
-
-#[cfg(feature = "dotenv")]
-impl From<dotenvy::Error> for Error {
-    fn from(value: dotenvy::Error) -> Self {
-        Self::Dotenv(value)
-    }
-}
-
-#[cfg(feature = "extrapolation")]
-impl From<std::io::Error> for Error {
-    fn from(value: std::io::Error) -> Self {
-        Self::Io(value)
-    }
-}
-
-#[derive(Debug)]
-pub struct Parse {
-    key: String,
-    ty: String,
-    error: String,
-}
-
-#[derive(Debug)]
-pub struct Unicode {
-    key: String,
-    value: std::ffi::OsString,
-}
-
-impl std::fmt::Display for Error {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let s = match self {
-            #[cfg(feature = "extrapolation")]
-            Self::Command(command, output) => format!("Command '{command}' failed: {output:?}"),
-            #[cfg(feature = "dotenv")]
-            Self::Dotenv(error) => error.to_string(),
-            #[cfg(feature = "extrapolation")]
-            Self::Io(error) => error.to_string(),
-            #[cfg(feature = "logger")]
-            Self::Logger(error) => error.clone(),
-            Self::Parse(Parse { key, ty, error }) => {
-                format!("Enable to parse '{key}' variable to '{ty}': {error}")
-            }
-            Self::Missing(v) => format!("Missing '{v}' environment variable"),
-            Self::Unicode(Unicode { key, value }) => {
-                format!("environment variable '{key}' was not valid unicode: {value:?}")
-            }
-        };
-
-        write!(f, "{s}")
-    }
-}
-
-impl std::error::Error for Error {}
