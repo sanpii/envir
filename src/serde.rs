@@ -86,7 +86,7 @@ where
 
         default
             .map(|x| {
-                try_replace(&regex, &x, |caps: &regex::Captures| {
+                try_replace(regex, &x, |caps: &regex::Captures| {
                     let content = if let Some(name) = caps.name("name") {
                         crate::get(name.as_str())?
                     } else if let Some(cmd) = caps.name("cmd") {
