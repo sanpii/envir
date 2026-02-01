@@ -61,6 +61,18 @@ fn gen_field(
         var.insert_str(0, attr.prefix.as_deref().unwrap_or(""));
     }
 
+    if field_attr.compilation {
+        let env = if crate::is_option(&field.ty) {
+            quote::quote! { ::std::option_env }
+        } else {
+            quote::quote! { ::std::env }
+        };
+
+        return Ok(quote::quote! {
+            #name: #env!(#var)
+        });
+    }
+
     if field_attr.skip || field_attr.skip_load {
         return Ok(quote::quote! {
             #name: Default::default()

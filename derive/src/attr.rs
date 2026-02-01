@@ -24,6 +24,8 @@ impl Container {
 #[darling(attributes(envir))]
 pub(crate) struct Field {
     #[darling(default)]
+    pub compilation: bool,
+    #[darling(default)]
     pub default: Option<darling::util::Override<String>>,
     pub export_with: Option<syn::ExprPath>,
     pub load_with: Option<syn::ExprPath>,

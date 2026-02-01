@@ -70,7 +70,8 @@ $ cargo run
 - `skip_load`: don’t load this field;
 - `skip_export`: don’t export this field;
 - `skip_export_if`: call a function to determine whether to export this field or
-  not. The given function must be callable as `fn(&T) -> bool`.
+  not. The given function must be callable as `fn(&T) -> bool`;
+- `compilation`: load variable at compilation time with `env!` or `option_env!`.
 
 ```rust
 use envir::Deserialize;
