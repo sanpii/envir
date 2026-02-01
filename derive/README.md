@@ -62,6 +62,8 @@ $ cargo run
   be callable as `fn (T) -> HashMap<String, String>`;
 - `load_with`: use this function to load this field. The given function must
   be callable as `fn (Hashmap<String, String>) -> envir::Result<T>`;
+- `with`: combine `export_with` and `load_with` in a module with `mod::export`
+  and `mod::load` functions;
 - `noprefix`: doesn’t add the `prefix` for this field;
 - `nested`: this field should be de/serialized recursively;
 - `skip`: skip this field, don’t load or export it;

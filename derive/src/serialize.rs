@@ -44,10 +44,14 @@ fn gen_field(
     attr: &crate::attr::Container,
     field: &syn::Field,
 ) -> syn::Result<Option<proc_macro2::TokenStream>> {
-    use darling::FromField;
+    use darling::FromField as _;
 
     let envir = attr.envir();
     let field_attr = crate::attr::Field::from_field(field)?;
+
+    if field_attr.export_with.is_some() && field_attr.with.is_some () {
+        return crate::error(field, "use export_with or with attr, not both");
+    }
 
     if field_attr.skip || field_attr.skip_export {
         return Ok(None);
@@ -67,6 +71,10 @@ fn gen_field(
     let mut r#gen = if let Some(export_with) = field_attr.export_with {
         return Ok(Some(quote::quote! {
             hash_map.extend(#export_with(&self.#name));
+        }));
+    } else if let Some(with) = field_attr.with {
+        return Ok(Some(quote::quote! {
+            hash_map.extend(#with::export(&self.#name));
         }));
     } else if crate::is_option(&field.ty) && field_attr.nested {
         quote::quote! {

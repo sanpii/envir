@@ -42,9 +42,14 @@ fn gen_field(
     attr: &crate::attr::Container,
     field: &syn::Field,
 ) -> syn::Result<proc_macro2::TokenStream> {
-    use darling::FromField;
+    use darling::FromField as _;
 
     let field_attr = crate::attr::Field::from_field(field)?;
+
+    if field_attr.load_with.is_some() && field_attr.with.is_some () {
+        return crate::error(field, "use load_with or with attr, not both");
+    }
+
     let envir = attr.envir();
     let name = &field.ident;
     let mut var = field_attr
@@ -65,6 +70,12 @@ fn gen_field(
     if let Some(load_with) = field_attr.load_with {
         return Ok(quote::quote! {
             #name: #load_with(&env)?
+        });
+    }
+
+    if let Some(with) = field_attr.with {
+        return Ok(quote::quote! {
+            #name: #with::load(&env)?
         });
     }
 

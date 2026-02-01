@@ -40,4 +40,5 @@ pub(crate) struct Field {
     pub skip: bool,
     pub skip_export_if: Option<syn::ExprPath>,
     pub separator: Option<char>,
+    pub with: Option<syn::ExprPath>,
 }
