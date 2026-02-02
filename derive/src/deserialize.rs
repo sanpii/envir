@@ -46,7 +46,7 @@ fn gen_field(
 
     let field_attr = crate::attr::Field::from_field(field)?;
 
-    if field_attr.load_with.is_some() && field_attr.with.is_some () {
+    if field_attr.load_with.is_some() && field_attr.with.is_some() {
         return crate::error(field, "use load_with or with attr, not both");
     }
 

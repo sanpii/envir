@@ -49,7 +49,7 @@ fn gen_field(
     let envir = attr.envir();
     let field_attr = crate::attr::Field::from_field(field)?;
 
-    if field_attr.export_with.is_some() && field_attr.with.is_some () {
+    if field_attr.export_with.is_some() && field_attr.with.is_some() {
         return crate::error(field, "use export_with or with attr, not both");
     }
 
